@@ -24,15 +24,19 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '22'
       
-      - name: Install and Build
+      - name: Install Dependencies
         run: |
           cd client
           npm install
+      
+      - name: Build
+        run: |
+          cd client
           npm run build
       
-      - name: Upload
+      - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: client/build
@@ -44,6 +48,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
-      - name: Deploy
+      - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
