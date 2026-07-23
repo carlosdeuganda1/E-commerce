@@ -581,7 +581,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Support
 
-For support, email support@yourapp.com or join our Slack channel.
+For support, email carlosdeuganda@gmail.com or contact me on WhatsApp +256 707 071 929 
 
 ---
 
