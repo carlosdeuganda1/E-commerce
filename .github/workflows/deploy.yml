@@ -21,6 +21,30 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       
+      - name: Show all files
+        run: ls -la
+      
+      - name: Show client folder
+        run: |
+          if [ -d "client" ]; then
+            echo "✅ client folder exists!"
+            ls -la client
+          else
+            echo "❌ client folder NOT found!"
+            ls -la
+            exit 1
+          fi
+      
+      - name: Show package.json
+        run: |
+          if [ -f "client/package.json" ]; then
+            echo "✅ package.json exists!"
+            cat client/package.json
+          else
+            echo "❌ package.json NOT found!"
+            exit 1
+          fi
+      
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
