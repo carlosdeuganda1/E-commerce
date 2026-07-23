@@ -21,29 +21,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       
-      - name: Show all files
-        run: ls -la
-      
-      - name: Show client folder
+      - name: Show files
         run: |
-          if [ -d "client" ]; then
-            echo "✅ client folder exists!"
-            ls -la client
-          else
-            echo "❌ client folder NOT found!"
-            ls -la
-            exit 1
-          fi
-      
-      - name: Show package.json
-        run: |
-          if [ -f "client/package.json" ]; then
-            echo "✅ package.json exists!"
-            cat client/package.json
-          else
-            echo "❌ package.json NOT found!"
-            exit 1
-          fi
+          echo "Root directory:"
+          ls -la
+          echo ""
+          echo "Client directory:"
+          ls -la client || echo "client folder not found"
       
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -51,14 +35,12 @@ jobs:
           node-version: '22'
       
       - name: Install Dependencies
-        run: |
-          cd client
-          npm install
+        working-directory: client
+        run: npm install
       
       - name: Build
-        run: |
-          cd client
-          npm run build
+        working-directory: client
+        run: npm run build
       
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
