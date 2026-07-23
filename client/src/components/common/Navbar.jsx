@@ -21,6 +21,7 @@ import {
   ListItemIcon,
   ListItemText,
   Divider,
+  Chip,
 } from '@mui/material';
 import {
   ShoppingCart,
@@ -33,8 +34,12 @@ import {
   History,
   ExitToApp,
   AdminPanelSettings,
+  Dashboard,
+  Settings,
+  Help,
 } from '@mui/icons-material';
 import { Link, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 function Navbar() {
   const theme = useTheme();
@@ -43,13 +48,25 @@ function Navbar() {
   const [searchTerm, setSearchTerm] = useState('');
   const [anchorEl, setAnchorEl] = useState(null);
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
-  const isLoggedIn = false; // Will be replaced with actual auth state
+  
+  // Mock auth state - replace with actual auth
+  const isLoggedIn = true; // Set to true for testing
   const isAdmin = false;
+  const user = {
+    name: 'John Doe',
+    email: 'john@example.com',
+  };
+
+  // Mock counts - replace with actual data
+  const cartCount = 2;
+  const wishlistCount = 3;
 
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchTerm.trim()) {
       navigate(`/products?search=${searchTerm}`);
+      setSearchTerm('');
+      if (isMobile) setMobileDrawerOpen(false);
     }
   };
 
@@ -59,6 +76,16 @@ function Navbar() {
 
   const handleMenuClose = () => {
     setAnchorEl(null);
+  };
+
+  const handleLogout = () => {
+    handleMenuClose();
+    toast.success('Logged out successfully!', {
+      position: 'bottom-right',
+    });
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    navigate('/login');
   };
 
   const menuItems = [
@@ -99,7 +126,7 @@ function Navbar() {
               🛍️ ShopHub
             </Typography>
 
-            {/* Search Bar */}
+            {/* Search Bar - Desktop */}
             {!isMobile && (
               <Box
                 component="form"
@@ -141,22 +168,25 @@ function Navbar() {
                 </IconButton>
               ) : (
                 <>
+                  {/* Wishlist Icon */}
                   <IconButton
                     color="inherit"
                     component={Link}
                     to="/wishlist"
+                    sx={{ display: { xs: 'none', sm: 'inline-flex' } }}
                   >
-                    <Badge badgeContent={3} color="secondary">
+                    <Badge badgeContent={wishlistCount} color="secondary">
                       <Favorite />
                     </Badge>
                   </IconButton>
 
+                  {/* Cart Icon */}
                   <IconButton
                     color="inherit"
                     component={Link}
                     to="/cart"
                   >
-                    <Badge badgeContent={2} color="primary">
+                    <Badge badgeContent={cartCount} color="primary">
                       <ShoppingCart />
                     </Badge>
                   </IconButton>
@@ -167,7 +197,7 @@ function Navbar() {
                 <>
                   <IconButton onClick={handleMenuOpen} sx={{ p: 0 }}>
                     <Avatar sx={{ bgcolor: 'primary.main', width: 32, height: 32 }}>
-                      U
+                      {user.name?.[0] || 'U'}
                     </Avatar>
                   </IconButton>
                   <Menu
@@ -176,7 +206,26 @@ function Navbar() {
                     onClose={handleMenuClose}
                     anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                     transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+                    PaperProps={{
+                      sx: {
+                        mt: 1.5,
+                        minWidth: 200,
+                        borderRadius: 2,
+                        boxShadow: theme.shadows[4],
+                      },
+                    }}
                   >
+                    {/* User Info */}
+                    <Box sx={{ px: 2, py: 1.5, bgcolor: 'grey.50' }}>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                        {user.name}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {user.email}
+                      </Typography>
+                    </Box>
+                    <Divider />
+                    
                     <MenuItem onClick={handleMenuClose} component={Link} to="/profile">
                       <ListItemIcon><Person fontSize="small" /></ListItemIcon>
                       Profile
@@ -188,16 +237,38 @@ function Navbar() {
                     <MenuItem onClick={handleMenuClose} component={Link} to="/wishlist">
                       <ListItemIcon><Favorite fontSize="small" /></ListItemIcon>
                       Wishlist
+                      <Chip label={wishlistCount} size="small" color="secondary" sx={{ ml: 'auto' }} />
                     </MenuItem>
+                    <MenuItem onClick={handleMenuClose} component={Link} to="/cart">
+                      <ListItemIcon><ShoppingCart fontSize="small" /></ListItemIcon>
+                      Cart
+                      <Chip label={cartCount} size="small" color="primary" sx={{ ml: 'auto' }} />
+                    </MenuItem>
+                    
                     {isAdmin && (
-                      <MenuItem onClick={handleMenuClose} component={Link} to="/admin">
-                        <ListItemIcon><AdminPanelSettings fontSize="small" /></ListItemIcon>
-                        Admin Dashboard
-                      </MenuItem>
+                      <>
+                        <Divider />
+                        <MenuItem onClick={handleMenuClose} component={Link} to="/admin">
+                          <ListItemIcon><AdminPanelSettings fontSize="small" /></ListItemIcon>
+                          Admin Dashboard
+                        </MenuItem>
+                      </>
                     )}
+                    
                     <Divider />
-                    <MenuItem onClick={handleMenuClose}>
-                      <ListItemIcon><ExitToApp fontSize="small" /></ListItemIcon>
+                    <MenuItem onClick={handleMenuClose} component={Link} to="/settings">
+                      <ListItemIcon><Settings fontSize="small" /></ListItemIcon>
+                      Settings
+                    </MenuItem>
+                    <MenuItem onClick={handleMenuClose} component={Link} to="/help">
+                      <ListItemIcon><Help fontSize="small" /></ListItemIcon>
+                      Help & Support
+                    </MenuItem>
+                    <Divider />
+                    <MenuItem onClick={handleLogout} sx={{ color: 'error.main' }}>
+                      <ListItemIcon sx={{ color: 'error.main' }}>
+                        <ExitToApp fontSize="small" />
+                      </ListItemIcon>
                       Logout
                     </MenuItem>
                   </Menu>
@@ -250,15 +321,48 @@ function Navbar() {
         anchor="left"
         open={mobileDrawerOpen}
         onClose={() => setMobileDrawerOpen(false)}
+        PaperProps={{
+          sx: {
+            width: 280,
+            borderRadius: '0 16px 16px 0',
+          },
+        }}
       >
-        <Box sx={{ width: 280, pt: 2 }}>
-          <Typography
-            variant="h6"
-            sx={{ px: 2, pb: 2, color: 'primary.main', fontWeight: 700 }}
-          >
-            🛍️ ShopHub
-          </Typography>
+        <Box sx={{ pt: 2 }}>
+          {/* Drawer Header */}
+          <Box sx={{ px: 2, pb: 2 }}>
+            <Typography
+              variant="h6"
+              sx={{
+                color: 'primary.main',
+                fontWeight: 700,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1,
+              }}
+            >
+              🛍️ ShopHub
+            </Typography>
+            {isLoggedIn && (
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mt: 2 }}>
+                <Avatar sx={{ bgcolor: 'primary.main' }}>
+                  {user.name?.[0] || 'U'}
+                </Avatar>
+                <Box>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                    {user.name}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    {user.email}
+                  </Typography>
+                </Box>
+              </Box>
+            )}
+          </Box>
+          
           <Divider />
+
+          {/* Navigation Menu */}
           <List>
             {menuItems.map((item) => (
               <ListItem
@@ -267,35 +371,184 @@ function Navbar() {
                 component={Link}
                 to={item.path}
                 onClick={() => setMobileDrawerOpen(false)}
+                sx={{
+                  borderRadius: 2,
+                  mx: 1,
+                  '&:hover': {
+                    bgcolor: 'primary.light',
+                  },
+                }}
               >
-                <ListItemIcon>{item.icon}</ListItemIcon>
+                <ListItemIcon sx={{ color: 'text.secondary' }}>
+                  {item.icon}
+                </ListItemIcon>
                 <ListItemText primary={item.text} />
+                {item.text === 'Wishlist' && wishlistCount > 0 && (
+                  <Chip label={wishlistCount} size="small" color="secondary" />
+                )}
+                {item.text === 'Cart' && cartCount > 0 && (
+                  <Chip label={cartCount} size="small" color="primary" />
+                )}
               </ListItem>
             ))}
-            <Divider />
+
+            <Divider sx={{ my: 1 }} />
+
             {isLoggedIn ? (
               <>
-                <ListItem button component={Link} to="/profile" onClick={() => setMobileDrawerOpen(false)}>
+                <ListItem
+                  button
+                  component={Link}
+                  to="/profile"
+                  onClick={() => setMobileDrawerOpen(false)}
+                  sx={{
+                    borderRadius: 2,
+                    mx: 1,
+                    '&:hover': {
+                      bgcolor: 'primary.light',
+                    },
+                  }}
+                >
                   <ListItemIcon><Person /></ListItemIcon>
                   <ListItemText primary="Profile" />
                 </ListItem>
-                <ListItem button onClick={() => {}}>
-                  <ListItemIcon><ExitToApp /></ListItemIcon>
+                <ListItem
+                  button
+                  component={Link}
+                  to="/orders"
+                  onClick={() => setMobileDrawerOpen(false)}
+                  sx={{
+                    borderRadius: 2,
+                    mx: 1,
+                    '&:hover': {
+                      bgcolor: 'primary.light',
+                    },
+                  }}
+                >
+                  <ListItemIcon><History /></ListItemIcon>
+                  <ListItemText primary="My Orders" />
+                </ListItem>
+                <ListItem
+                  button
+                  component={Link}
+                  to="/wishlist"
+                  onClick={() => setMobileDrawerOpen(false)}
+                  sx={{
+                    borderRadius: 2,
+                    mx: 1,
+                    '&:hover': {
+                      bgcolor: 'primary.light',
+                    },
+                  }}
+                >
+                  <ListItemIcon><Favorite /></ListItemIcon>
+                  <ListItemText primary="Wishlist" />
+                  {wishlistCount > 0 && (
+                    <Chip label={wishlistCount} size="small" color="secondary" />
+                  )}
+                </ListItem>
+                <ListItem
+                  button
+                  component={Link}
+                  to="/cart"
+                  onClick={() => setMobileDrawerOpen(false)}
+                  sx={{
+                    borderRadius: 2,
+                    mx: 1,
+                    '&:hover': {
+                      bgcolor: 'primary.light',
+                    },
+                  }}
+                >
+                  <ListItemIcon><ShoppingCart /></ListItemIcon>
+                  <ListItemText primary="Cart" />
+                  {cartCount > 0 && (
+                    <Chip label={cartCount} size="small" color="primary" />
+                  )}
+                </ListItem>
+                {isAdmin && (
+                  <ListItem
+                    button
+                    component={Link}
+                    to="/admin"
+                    onClick={() => setMobileDrawerOpen(false)}
+                    sx={{
+                      borderRadius: 2,
+                      mx: 1,
+                      '&:hover': {
+                        bgcolor: 'primary.light',
+                      },
+                    }}
+                  >
+                    <ListItemIcon><Dashboard /></ListItemIcon>
+                    <ListItemText primary="Admin Dashboard" />
+                  </ListItem>
+                )}
+                <Divider />
+                <ListItem
+                  button
+                  onClick={() => {
+                    setMobileDrawerOpen(false);
+                    handleLogout();
+                  }}
+                  sx={{
+                    borderRadius: 2,
+                    mx: 1,
+                    color: 'error.main',
+                    '&:hover': {
+                      bgcolor: 'error.light',
+                    },
+                  }}
+                >
+                  <ListItemIcon sx={{ color: 'error.main' }}>
+                    <ExitToApp />
+                  </ListItemIcon>
                   <ListItemText primary="Logout" />
                 </ListItem>
               </>
             ) : (
-              <ListItem
-                button
-                component={Link}
-                to="/login"
-                onClick={() => setMobileDrawerOpen(false)}
-              >
-                <ListItemIcon><Person /></ListItemIcon>
-                <ListItemText primary="Login / Register" />
-              </ListItem>
+              <>
+                <ListItem
+                  button
+                  component={Link}
+                  to="/login"
+                  onClick={() => setMobileDrawerOpen(false)}
+                  sx={{
+                    borderRadius: 2,
+                    mx: 1,
+                    bgcolor: 'primary.main',
+                    color: 'white',
+                    '&:hover': {
+                      bgcolor: 'primary.dark',
+                    },
+                  }}
+                >
+                  <ListItemIcon sx={{ color: 'white' }}>
+                    <Person />
+                  </ListItemIcon>
+                  <ListItemText primary="Login / Register" primaryTypographyProps={{ fontWeight: 600 }} />
+                </ListItem>
+              </>
             )}
           </List>
+
+          {/* Footer */}
+          <Box sx={{ p: 2, mt: 'auto', bgcolor: 'grey.50' }}>
+            <Typography variant="caption" color="text.secondary" display="block">
+              © 2024 ShopHub
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 2, mt: 1 }}>
+              <Typography variant="caption" color="text.secondary">
+                Help
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                Privacy
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                Terms
+              </Typography>
+            </Box>
+          </Box>
         </Box>
       </Drawer>
     </>
