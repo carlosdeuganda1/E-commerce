@@ -1,0 +1,222 @@
+import React, { useState } from 'react';
+import {
+  Box,
+  TextField,
+  Button,
+  FormControlLabel,
+  Checkbox,
+  Typography,
+  InputAdornment,
+  IconButton,
+  Alert,
+  CircularProgress,
+} from '@mui/material';
+import {
+  Email,
+  Lock,
+  Visibility,
+  VisibilityOff,
+} from '@mui/icons-material';
+import { Link, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import AuthLayout from '../components/auth/AuthLayout';
+import SocialLogin from '../components/auth/SocialLogin';
+
+function LoginPage() {
+  const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+    rememberMe: false,
+  });
+  const [errors, setErrors] = useState({});
+
+  const handleChange = (e) => {
+    const { name, value, checked } = e.target;
+    setFormData({
+      ...formData,
+      [name]: name === 'rememberMe' ? checked : value,
+    });
+    // Clear error when user types
+    if (errors[name]) {
+      setErrors({ ...errors, [name]: '' });
+    }
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+    if (!formData.email) {
+      newErrors.email = 'Email is required';
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = 'Email is invalid';
+    }
+    if (!formData.password) {
+      newErrors.password = 'Password is required';
+    } else if (formData.password.length < 6) {
+      newErrors.password = 'Password must be at least 6 characters';
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!validateForm()) return;
+
+    setLoading(true);
+    try {
+      // Mock API call - replace with actual API
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // Mock successful login
+      localStorage.setItem('token', 'mock-jwt-token');
+      localStorage.setItem('user', JSON.stringify({
+        email: formData.email,
+        name: 'John Doe',
+      }));
+      
+      toast.success('Welcome back! Redirecting...', {
+        position: 'bottom-right',
+      });
+      
+      setTimeout(() => {
+        navigate('/');
+      }, 1000);
+    } catch (error) {
+      toast.error('Invalid email or password', {
+        position: 'bottom-right',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <AuthLayout
+      title="Welcome Back"
+      subtitle="Sign in to continue shopping"
+      image="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&h=600&fit=crop"
+      alternateLink="/register"
+      alternateText="Don't have an account?"
+    >
+      <form onSubmit={handleSubmit}>
+        {/* Email Field */}
+        <TextField
+          fullWidth
+          label="Email Address"
+          name="email"
+          type="email"
+          value={formData.email}
+          onChange={handleChange}
+          error={!!errors.email}
+          helperText={errors.email}
+          disabled={loading}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <Email color="action" />
+              </InputAdornment>
+            ),
+          }}
+          sx={{ mb: 3 }}
+        />
+
+        {/* Password Field */}
+        <TextField
+          fullWidth
+          label="Password"
+          name="password"
+          type={showPassword ? 'text' : 'password'}
+          value={formData.password}
+          onChange={handleChange}
+          error={!!errors.password}
+          helperText={errors.password}
+          disabled={loading}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <Lock color="action" />
+              </InputAdornment>
+            ),
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton
+                  onClick={() => setShowPassword(!showPassword)}
+                  edge="end"
+                >
+                  {showPassword ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
+          sx={{ mb: 2 }}
+        />
+
+        {/* Options */}
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            mb: 3,
+            flexWrap: 'wrap',
+            gap: 1,
+          }}
+        >
+          <FormControlLabel
+            control={
+              <Checkbox
+                name="rememberMe"
+                checked={formData.rememberMe}
+                onChange={handleChange}
+                color="primary"
+                disabled={loading}
+              />
+            }
+            label="Remember me"
+          />
+          <Typography
+            component={Link}
+            to="/forgot-password"
+            variant="body2"
+            color="primary"
+            sx={{
+              textDecoration: 'none',
+              '&:hover': { textDecoration: 'underline' },
+            }}
+          >
+            Forgot password?
+          </Typography>
+        </Box>
+
+        {/* Submit Button */}
+        <Button
+          fullWidth
+          type="submit"
+          variant="contained"
+          size="large"
+          disabled={loading}
+          sx={{
+            py: 1.5,
+            borderRadius: 2,
+            fontSize: '1rem',
+            fontWeight: 600,
+          }}
+        >
+          {loading ? (
+            <CircularProgress size={24} color="inherit" />
+          ) : (
+            'Sign In'
+          )}
+        </Button>
+
+        {/* Social Login */}
+        <SocialLogin />
+      </form>
+    </AuthLayout>
+  );
+}
+
+export default LoginPage;
