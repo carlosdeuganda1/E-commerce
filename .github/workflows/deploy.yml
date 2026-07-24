@@ -27,19 +27,18 @@ jobs:
           node-version: '22'
       
       - name: Install Dependencies
-        run: |
-          cd client
-          npm install
+        working-directory: client
+        run: npm install
       
       - name: Build
+        working-directory: client
         run: |
-          cd client
-          npm run build
+          CI=false npm run build    # ← THIS IS THE FIX
       
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: client/build  # ← IMPORTANT CHANGE
+          path: client/build
 
   deploy:
     environment:
