@@ -14,6 +14,7 @@ import WishlistPage from './pages/WishlistPage';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminProducts from './pages/AdminProducts';
 import AdminOrders from './pages/AdminOrders';
+import AdminUsers from './pages/AdminUsers';
 
 function App() {
   return (
@@ -41,6 +42,7 @@ function App() {
           <Route path="/admin" element={<AdminDashboard />} /> {/* NEW */}
           <Route path="/admin/products" element={<AdminProducts />} />
           <Route path="/admin/orders" element={<AdminOrders />} />
+          <Route path="/admin/users" element={<AdminUsers />} />
         </Routes>
       </Layout>
     </BrowserRouter>
