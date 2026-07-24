@@ -21,31 +21,25 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       
-      - name: Show files
-        run: |
-          echo "Root directory:"
-          ls -la
-          echo ""
-          echo "Client directory:"
-          ls -la client || echo "client folder not found"
-      
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: '22'
       
       - name: Install Dependencies
-        working-directory: client
-        run: npm install
+        run: |
+          cd client
+          npm install
       
       - name: Build
-        working-directory: client
-        run: npm run build
+        run: |
+          cd client
+          npm run build
       
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: client/build
+          path: client/build  # ← IMPORTANT CHANGE
 
   deploy:
     environment:
