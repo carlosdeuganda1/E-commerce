@@ -11,7 +11,8 @@ import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ProfilePage from './pages/ProfilePage';
 import OrdersPage from './pages/OrdersPage';
 import WishlistPage from './pages/WishlistPage';
-import AdminDashboard from './pages/AdminDashboard'; // NEW
+import AdminDashboard from './pages/AdminDashboard';
+import AdminProducts from './pages/AdminProducts';
 
 function App() {
   return (
@@ -37,7 +38,8 @@ function App() {
           
           {/* Admin Routes */}
           <Route path="/admin" element={<AdminDashboard />} /> {/* NEW */}
-        </Routes>
+       <Route path="/admin/products" element={<AdminProducts />} />
+            </Routes>
       </Layout>
     </BrowserRouter>
   );
