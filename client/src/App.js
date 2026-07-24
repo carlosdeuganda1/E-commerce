@@ -13,6 +13,7 @@ import OrdersPage from './pages/OrdersPage';
 import WishlistPage from './pages/WishlistPage';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminProducts from './pages/AdminProducts';
+import AdminOrders from './pages/AdminOrders';
 
 function App() {
   return (
@@ -38,8 +39,9 @@ function App() {
           
           {/* Admin Routes */}
           <Route path="/admin" element={<AdminDashboard />} /> {/* NEW */}
-       <Route path="/admin/products" element={<AdminProducts />} />
-            </Routes>
+          <Route path="/admin/products" element={<AdminProducts />} />
+          <Route path="/admin/orders" element={<AdminOrders />} />
+        </Routes>
       </Layout>
     </BrowserRouter>
   );
